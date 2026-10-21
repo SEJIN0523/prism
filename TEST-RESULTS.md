@@ -1,4 +1,4 @@
-# PRISM V1.1 독립 저장소 이전 검증
+# PRISM V1.1 독립 저장소 이전 검증 (설치 지원 이전 이력)
 
 검증일: 2026-10-22 (한국 시간)
 
@@ -24,3 +24,17 @@
 - CLI의 GitHub Pages 설정 API는 네트워크 정책에 의해 Forbidden 응답. 따라서 Pages 활성화 여부를 읽거나 변경하지 못함.
 - 목표 `https://sejin0523.github.io/prism/`와 기존 `https://sejin0523.github.io/close-score/` 모두 환경 프록시에서 CONNECT 403으로 차단. 실제 페이지 접속/정상 동작을 확인했다고 보고하지 않음.
 - 사용자 설정이 필요한 경우: 새 저장소 Settings → Pages → Source를 GitHub Actions로 선택하고, 새 저장소 Actions의 Deploy PRISM to GitHub Pages를 main에서 실행. 성공 뒤 두 URL을 실제 브라우저에서 확인해야 함.
+
+
+# 최소 PWA 설치 지원 검증 — 2026-10-22 (한국 시간)
+
+- 원래 UI·장부 로직(app.js, components/, config/, data/, services/)은 배포 기준 커밋 `3eed678`과 변경 없음. index.html에 manifest 링크·터치 아이콘·등록 모듈만 추가.
+- 추가 파일: manifest.webmanifest, install.js, sw.js, icons/icon-192.png, icons/icon-512.png. 기존 Claude 저장소 파일 수정 없음.
+- `npm test`: 기존 16개 + 설치 manifest/PNG 규격 검사 + 워커 캐시·범위·요청 전달 검사 = 18개 통과.
+- `npm run build`: 공개 파일 14개 패키징 성공. 테스트·문서·개인 백업 미포함.
+- 일반 프로필의 headless Chromium에서 `Page.getAppManifest` 오류 0개, `Page.getInstallabilityErrors` 오류 0개. 서비스워커 scope·script URL, 192/512 이미지 실제 디코딩 크기 확인. 최초 시크릿 테스트 프로필은 in-incognito로 설치가 제한되어, 일반 임시 프로필에서 검증함.
+- 네트워크 GET 후 CacheStorage 목록 빈 배열. 오프라인 fetch 실패 확인(오프라인 대체 캐시 없음). 해당 상태에서도 localStorage 장부 원문 유지, 온라인 복귀·새로고침 후 기록 유지. GET 외 업로드 요청 0건, 온라인 pageerror 0건.
+- `/close-score/` 이동 후 PRISM 서비스워커 controller null 확인. 워커 단위 테스트에서 외부 origin, POST, `/close-score/`, `/prism-other/` 요청 무간섭 확인.
+- 기존 브라우저 테스트 재실행: 50개 화면/테마/너비 조합, 거래·설정·백업·복원·복원 전 보관·다른 탭 충돌·Claude 키 보존 모두 통과. 설치 자산·서비스워커 존재 검사만 새 요구사항에 맞게 변경.
+- 실제 삼성 인터넷·Android Chrome에서 앱 설치 메뉴 및 설치 후 standalone 창 실행은 실기기 미검증. manifest standalone 선언과 Chromium 설치 조건까지만 자동 검증함.
+- 실제 정식 URL HTTP 검증은 기존 환경 정책의 CONNECT 403 제한 때문에 미검증. 배포 여부는 GitHub Actions 결과로 별도 확인.

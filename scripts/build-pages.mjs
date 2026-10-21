@@ -9,6 +9,11 @@ export async function buildPages(output = resolve("_site")) {
     throw Error("Build output must not contain the source directory.");
   const files = [
     "index.html",
+    "manifest.webmanifest",
+    "install.js",
+    "sw.js",
+    "icons/icon-192.png",
+    "icons/icon-512.png",
     "styles.css",
     "app.js",
     "components/ui.js",

@@ -91,12 +91,12 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/prism/";
     await p.evaluate(() => localStorage.getItem("close-score-portfolio")),
     "CLAUDE-UNCHANGED",
   );
-  assert.equal(await p.locator("link[rel=manifest]").count(), 0);
+  assert.equal(await p.locator("link[rel=manifest]").count(), 1);
   assert.equal(
     await p.evaluate(
       async () => (await navigator.serviceWorker.getRegistrations()).length,
     ),
-    0,
+    1,
   );
   for (const width of [320, 390, 430, 768, 1440]) {
     await p.setViewportSize({ width, height: 844 });
@@ -119,7 +119,7 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/prism/";
     "CLAUDE-UNCHANGED",
   );
   console.log(
-    "PASS: standalone /prism/, cancel/invalid restore, recovery download/reload, cross-tab conflict, Claude keys, mobile restore UI, no manifest/registration/upload, reset cleanup",
+    "PASS: standalone /prism/, cancel/invalid restore, recovery download/reload, cross-tab conflict, Claude keys, mobile restore UI, manifest/registration present, no record upload, reset cleanup",
   );
   await browser.close();
 })();

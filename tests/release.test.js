@@ -93,11 +93,19 @@ test("독립 Pages 루트 패키징, 실행 파일만 포함, 재실행 시 잔�
     );
     assert.ok(
       !files.some((f) =>
-        /manifest|sw\.js|tests|backup|stale|README|package|stage-pages/.test(f),
+        /tests|backup|stale|README|package|stage-pages/.test(f),
       ),
     );
-    assert.equal(files.filter((f) => f.endsWith(".js")).length, 7);
+    assert.equal(files.filter((f) => f.endsWith(".js")).length, 9);
     assert.ok(!files.includes("prism"));
+    for (const asset of [
+      "manifest.webmanifest",
+      "install.js",
+      "sw.js",
+      "icons/icon-192.png",
+      "icons/icon-512.png",
+    ])
+      assert.ok(files.includes(asset));
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
