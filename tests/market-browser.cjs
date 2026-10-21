@@ -9,7 +9,7 @@ const base=process.env.PRISM_BASE_URL || 'http://127.0.0.1:4173/prism/';
  const p=await context.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
  await p.goto(base+'#explore');await p.waitForSelector('#search');
  assert.match(await p.locator('.market-status').textContent(),/stale.*2026-10-20/s);
- assert.match(await p.locator('.market-status').textContent(),/연구용·미검증/);
+ assert.match(await p.locator('.market-status').textContent(),/연구용·수익성 미검증/);
  assert.equal(await p.locator('.stock-row').count(),50);
  assert.match(await p.locator('.stock-name').first().textContent(),/서산/);
  await p.locator('[data-action=more-stocks]').click();assert.equal(await p.locator('.stock-row').count(),100);
