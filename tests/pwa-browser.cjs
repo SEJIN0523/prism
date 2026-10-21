@@ -7,7 +7,7 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4180/prism/";
     path = require("node:path");
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), "prism-install-"));
   const context = await chromium.launchPersistentContext(profile, {
-    executablePath: "/usr/bin/chromium",
+    executablePath: process.env.PRISM_BROWSER_EXECUTABLE || "/usr/bin/chromium",
     headless: true,
     args: ["--no-sandbox"],
     viewport: { width: 390, height: 844 },
@@ -79,6 +79,9 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4180/prism/";
     await p.evaluate(() => localStorage.getItem("prism-v1-state")),
     saved,
   );
+  await p.evaluate(async () => { const r = await navigator.serviceWorker.ready; await r.update(); });
+  assert.equal(await p.evaluate(() => localStorage.getItem("prism-v1-state")), saved);
+  await p.route("**/close-score/", route => route.fulfill({contentType:"text/html",body:"<!doctype html><title>Isolated scope fixture</title>"}));
   await p.goto(new URL("../close-score/", base).href);
   assert.equal(
     await p.evaluate(() => navigator.serviceWorker.controller),

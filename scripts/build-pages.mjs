@@ -1,11 +1,12 @@
 // Only copy public runtime files. Never copy local records, tests, or backups.
 import { cp, mkdir, access, rm } from "node:fs/promises";
-import { resolve, dirname, join } from "node:path";
+import { resolve, dirname, join, relative, isAbsolute } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 const source = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export async function buildPages(output = resolve("_site")) {
   const target = resolve(output);
-  if (target === source || source.startsWith(target + "/"))
+  const inside = relative(target, source);
+  if (inside === "" || (!inside.startsWith("..") && !isAbsolute(inside)))
     throw Error("Build output must not contain the source directory.");
   const files = [
     "index.html",
@@ -21,6 +22,7 @@ export async function buildPages(output = resolve("_site")) {
     "services/portfolio.js",
     "services/market.js",
     "data/catalog.js",
+    "data/prism-market.json",
     "config/app.js",
   ];
   for (const file of files) await access(join(source, file));

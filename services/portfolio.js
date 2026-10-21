@@ -33,7 +33,7 @@ export function calculate(initialCash, transactions, quotes = {}) {
       fail("거래 종류와 날짜를 확인하세요.");
     if (t.type === "buy" || t.type === "sell") {
       if (
-        !/^\d{6}$/.test(t.code) ||
+        !/^[0-9A-Z]{6}$/.test(t.code) ||
         !Number.isSafeInteger(t.quantity) ||
         t.quantity <= 0 ||
         !Number.isFinite(t.price) ||

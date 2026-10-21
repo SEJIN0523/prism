@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/prism/";
 (async () => {
   const browser = await chromium.launch({
-    executablePath: "/usr/bin/chromium",
+    executablePath: process.env.PRISM_BROWSER_EXECUTABLE || "/usr/bin/chromium",
     headless: true,
     args: ["--no-sandbox"],
   });
@@ -61,10 +61,10 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/prism/";
   );
   const dl = p.waitForEvent("download");
   await p.locator("[data-action=recovery]").click();
-  await (await dl).saveAs("/tmp/prism-v11-recovery.json");
+  await (await dl).saveAs(require("node:path").join(require("node:os").tmpdir(), "prism-v11-recovery.json"));
   assert.deepEqual(
     JSON.parse(
-      require("node:fs").readFileSync("/tmp/prism-v11-recovery.json", "utf8"),
+      require("node:fs").readFileSync(require("node:path").join(require("node:os").tmpdir(), "prism-v11-recovery.json"), "utf8"),
     ),
     JSON.parse(old),
   );
