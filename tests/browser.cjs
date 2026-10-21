@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/";
 (async () => {
   const browser = await chromium.launch({
-    executablePath: "/usr/bin/chromium",
+    executablePath: process.env.PRISM_BROWSER_EXECUTABLE || "/usr/bin/chromium",
     headless: true,
     args: ["--no-sandbox"],
   });
@@ -44,21 +44,24 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/";
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base + "#home");
-  await page.screenshot({ path: "/tmp/prism-home-light.png", fullPage: true });
+  await page.screenshot({ path: require("node:path").join(require("node:os").tmpdir(), "prism-home-light.png"), fullPage: true });
   await page.locator('[data-action="theme"]').click();
-  await page.screenshot({ path: "/tmp/prism-home-dark.png", fullPage: true });
+  await page.screenshot({ path: require("node:path").join(require("node:os").tmpdir(), "prism-home-dark.png"), fullPage: true });
   await page.goto(base + "#explore");
+  const data = require("../data/prism-market.json");
+  const current = data.stocks.filter(s=>s.listingStatus === "observed_on_asOf");
   await page.locator("#search").fill("삼성");
-  assert.equal(await page.locator(".stock-row").count(), 2);
+  assert.equal(await page.locator(".stock-row").count(), current.filter(s=>s.name.includes("삼성")).length);
   await page.locator("#search").fill("");
-  await page.locator("#sector").selectOption({ label: "자동차" });
-  assert.equal(await page.locator(".stock-row").count(), 2);
+  await page.locator("#sector").selectOption({ label: "TECH_HARDWARE" });
+  assert.equal(await page.locator(".stock-row").count(), current.filter(s=>s.sector === "TECH_HARDWARE").length);
   await page.locator("#sector").selectOption("전체");
   await page.locator("#sort").selectOption("code");
   assert.equal(
     await page.locator(".stock-name small").first().textContent(),
-    "000270 · KOSPI · 자동차",
+    `${current.sort((a,b)=>a.code.localeCompare(b.code))[0].code} · ${current[0].market} · ${current[0].sector}`,
   );
+  await page.locator("#search").fill("005930");
   await page.locator('[data-watch="005930"]').click();
   await page.locator("#only-watch").check();
   assert.equal(await page.locator(".stock-row").count(), 1);
@@ -102,14 +105,14 @@ const base = process.env.PRISM_BASE_URL || "http://127.0.0.1:4173/";
   const downloadPromise = page.waitForEvent("download");
   await page.locator("[data-action=backup]").click();
   const download = await downloadPromise;
-  await download.saveAs("/tmp/prism-test-backup.json");
+  await download.saveAs(require("node:path").join(require("node:os").tmpdir(), "prism-test-backup.json"));
   await page.goto(base + "#settings");
   await page.locator("[data-action=reset]").click();
   await page.locator("[name=confirmation]").fill("초기화");
   await page.locator("dialog [type=submit]").click();
   await page
     .locator("#restore-file")
-    .setInputFiles("/tmp/prism-test-backup.json");
+    .setInputFiles(require("node:path").join(require("node:os").tmpdir(), "prism-test-backup.json"));
   await page.locator("dialog [type=submit]").click();
   await page.locator("#target").fill("12");
   await page.locator("#target").dispatchEvent("change");

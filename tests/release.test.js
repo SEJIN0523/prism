@@ -8,6 +8,7 @@ import {
   rm,
   readdir,
 } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildPages } from "../scripts/build-pages.mjs";
@@ -85,7 +86,7 @@ test("독립 Pages 루트 패키징, 실행 파일만 포함, 재실행 시 잔�
     await buildPages(dir);
     await writeFile(join(dir, "stale.json"), "not public");
     await buildPages(dir);
-    const files = await readdir(dir, { recursive: true });
+    const files = (await readdir(dir, { recursive: true })).map(f=>f.replaceAll("\\", "/"));
     assert.ok(files.includes("index.html"));
     assert.equal(
       await readFile(join(dir, "index.html"), "utf8"),
@@ -98,6 +99,7 @@ test("독립 Pages 루트 패키징, 실행 파일만 포함, 재실행 시 잔�
     );
     assert.equal(files.filter((f) => f.endsWith(".js")).length, 9);
     assert.ok(!files.includes("prism"));
+    assert.deepEqual(await readFile(join(dir,"data/prism-market.json")), await readFile(new URL("../data/prism-market.json",import.meta.url)));
     for (const asset of [
       "manifest.webmanifest",
       "install.js",
@@ -112,7 +114,7 @@ test("독립 Pages 루트 패키징, 실행 파일만 포함, 재실행 시 잔�
 });
 test("소스 디렉터리를 빌드 출력으로 덮어쓰지 않음", async () => {
   await assert.rejects(
-    buildPages(new URL("..", import.meta.url).pathname),
+    buildPages(fileURLToPath(new URL("..", import.meta.url))),
     /source directory/,
   );
 });

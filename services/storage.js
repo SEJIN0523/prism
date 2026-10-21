@@ -16,7 +16,7 @@ export function validate(value) {
     throw Error("설정 형식이 올바르지 않습니다.");
   if (
     !Array.isArray(value.watchlist) ||
-    !value.watchlist.every((c) => typeof c === "string" && /^\d{6}$/.test(c))
+    !value.watchlist.every((c) => typeof c === "string" && /^[0-9A-Z]{6}$/.test(c))
   )
     throw Error("관심종목 형식이 올바르지 않습니다.");
   if (
@@ -27,7 +27,7 @@ export function validate(value) {
     throw Error("평가 가격 형식이 올바르지 않습니다.");
   for (const [code, q] of Object.entries(value.quotes))
     if (
-      !/^\d{6}$/.test(code) ||
+      !/^[0-9A-Z]{6}$/.test(code) ||
       !q ||
       !Number.isFinite(q.price) ||
       q.price <= 0 ||

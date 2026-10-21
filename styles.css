@@ -1287,3 +1287,26 @@ dialog .section-head {
     transition: none !important;
   }
 }
+/* Market integration: retain the existing layout and mobile navigation. */
+.market-status { margin-bottom: 24px; overflow-wrap: anywhere; }
+.market-status p { margin: 8px 0; }
+.market-status button { margin-top: 10px; }
+.stock-row { min-width: 0; }
+.stock-name { min-width: 0; overflow-wrap: anywhere; }
+.stock-score { text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.stock-score small { display: block; color: var(--muted); font-size: 10px; }
+.rank { color: var(--accent); margin-right: 5px; }
+.withheld { max-width: 30rem; }
+.quality dd { overflow-wrap: anywhere; min-width: 0; }
+.panel ul { padding-left: 20px; overflow-wrap: anywhere; }
+.decision { border-top: 1px solid var(--border); padding-top: 12px; }
+.decision li { margin: 5px 0; }
+.filters { flex-wrap: wrap; }
+.filters select { max-width: 100%; }
+@media (max-width: 480px) {
+ .stock-score { font-size: 13px; }
+ .stock-score small { font-size: 9px; }
+ .filters > label { min-width: 0; flex: 1 1 45%; }
+ .quality { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+ .market-status { font-size: 12px; }
+}

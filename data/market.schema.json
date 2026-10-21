@@ -1,0 +1,23 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schemaVersion","status","asOf","collectedAt","stocks","signals","sectors","risk","quality","provenance"],
+  "properties":{
+    "schemaVersion":{"const":"prism.market.v1"},
+    "status":{"enum":["stale","partial"]},
+    "asOf":{"type":"string","format":"date"},
+    "collectedAt":{"type":["string","null"],"format":"date-time"},
+    "stocks":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/stock"}},
+    "signals":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["code","type","asOf","review","checks","notAnOrder"],"properties":{"code":{"type":"string","pattern":"^[0-9A-Z]{6}$"},"type":{"enum":["buy_review","hold_review_if_held","sell_review_if_held"]},"asOf":{"type":"string","format":"date"},"review":{"const":true},"checks":{"type":"object"},"notAnOrder":{"const":true}}}},
+    "sectors":{"type":"array","items":{"type":"object","required":["group","kind","members","relativeStrength","usable","coverage"],"properties":{"members":{"type":"integer","minimum":1},"relativeStrength":{"type":"number"},"usable":{"type":"boolean"}}}},
+    "risk":{"type":"object","additionalProperties":false,"required":["breadthAboveMA200","cashTargetFraction","basis","profitabilityValidated","fullIndustryCoverage"],"properties":{"breadthAboveMA200":{"type":["number","null"],"minimum":0,"maximum":1},"cashTargetFraction":{"type":"number","minimum":0,"maximum":1},"basis":{"type":"string"},"profitabilityValidated":{"const":false},"fullIndustryCoverage":{"const":false}}},
+    "quality":{"type":"object","required":["coverage","requestedSession","latestSessionVerified","checkedAt","latestCollection","publicDataOnly","personalAccountIncluded","rawResponsesIncluded"],"properties":{"coverage":{"type":"object","required":["input","analyzed","notAnalyzed","currentSnapshot","historicalOnly"]},"requestedSession":{"type":"string","format":"date"},"latestSessionVerified":{"type":"boolean"},"checkedAt":{"type":"string","format":"date-time"},"latestCollection":{"type":"object","required":["status","errorCodes","httpStatus","authenticationConfirmed"]},"publicDataOnly":{"const":true},"personalAccountIncluded":{"const":false},"rawResponsesIncluded":{"const":false}}},
+    "provenance":{"type":"object","required":["analysisSha256","engineVersion","algorithmHashes","consumer","exporterSha256"],"properties":{"analysisSha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},"exporterSha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}}
+  },
+  "$defs":{
+    "stock":{"type":"object","additionalProperties":false,"required":["code","name","market","sector","securityKind","listingStatus","asOf","priceDate","price","rank","score","scoreBasis","scores","trend","support","risks","conditions","tradeConditions","indicators","quality"],"properties":{
+      "code":{"type":"string","pattern":"^[0-9A-Z]{6}$"},"name":{"type":"string"},"market":{"type":["string","null"]},"sector":{"type":"string"},"securityKind":{"type":"string"},"listingStatus":{"enum":["observed_on_asOf","historical_only_not_legal_status"]},"asOf":{"type":"string","format":"date"},"priceDate":{"type":["string","null"],"format":"date"},"price":{"type":["number","null"],"minimum":0},"rank":{"type":["integer","null"],"minimum":1},"score":{"type":["number","null"],"minimum":0,"maximum":100},"scoreBasis":{"const":"comparableTechnical"},"scores":{"type":"object","required":["comparableTechnical","comprehensive","components"]},"trend":{"type":"array"},"support":{"type":"array"},"risks":{"type":"array","items":{"type":"string"}},"conditions":{"type":"array","minItems":3,"maxItems":3},"tradeConditions":{"type":"object","required":["newBuy","holding","sell"]},"indicators":{"type":"object"},"quality":{"type":"object","required":["source","coverage","status","missing","priceStatus","financialStatus"],"properties":{"source":{"type":"string"},"coverage":{"type":"number","minimum":0,"maximum":1},"status":{"enum":["analyzed_full","analyzed_partial","not_rankable"]},"missing":{"type":"array"}}}
+    }}
+  }
+}
